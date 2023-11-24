@@ -1,0 +1,26 @@
+# If getting a warning after converting development replica set back to standalone
+# Log into container starter without replicaSet conf and run
+
+# use local
+# db.dropDatabase()
+
+# Ref: https://stackoverflow.com/questions/17544713/encountered-a-mongodb-warning-after-converting-a-replica-set-to-stand-alone-serv
+version: '3'
+services:
+  mongo:
+    container_name: mongo
+    image: library/mongo:7.0
+    # uncomment for using replicaSet in development
+    # command: --replSet rs0
+    volumes:
+      - /Users/omargonzalez/databases/mongodb/s9tpepper:/data/db
+    ports:
+      - '27017:27017'
+    # networks:
+      # - media-net
+    # uncomment for using replicaSet in development
+    # https://www.mongodb.com/docs/v4.4/reference/method/rs.initiate/
+    # https://stackoverflow.com/questions/42190267/replica-set-mongo-docker-compose
+    # healthcheck:
+    #   test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:\"localhost:27017\"}]}).ok || rs.status().ok" | mongo --port 27017 --quiet) -eq 1
+    #   interval: 10s
