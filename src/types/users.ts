@@ -4,8 +4,9 @@ export type LoginData = {
 }
 
 export type User = {
+  firstName: string
+  lastName: string
   username: string
   password: string
-  hash: string
-  roel: string
+  role: string
 }
