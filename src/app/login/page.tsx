@@ -1,10 +1,11 @@
 'use client'
+import type { LoginResponse } from '@/actions/users'
+import type { User, LoginData } from '@/types/users'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useFormStatus, useFormState } from 'react-dom'
 
-import { User, LoginData } from '@/types/users'
-import { LoginResponse, submitLogin } from '@/actions/users'
+import { submitLogin } from '@/actions/users'
 import { SubmitButton, CancelButton } from '@/components/Buttons'
 import { ErrorMessage } from '@/components/Errors'
 

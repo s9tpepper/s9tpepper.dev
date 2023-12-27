@@ -1,8 +1,8 @@
+import type { Nullable } from '@/types/utils'
+
 import Dotenv from 'dotenv'
 import { Db, MongoClient } from 'mongodb'
 Dotenv.config()
-
-type Nullable<T> = null | T
 
 const { MONGODB_URL = 'mongodb://localhost:27017' } = process.env
 let client: Nullable<MongoClient>
@@ -12,6 +12,7 @@ const onConnectionError = () => {
   client = null
   db = null
 }
+
 export const getDB = (): Db => {
   if (!client || !db) {
     client = new MongoClient(MONGODB_URL)

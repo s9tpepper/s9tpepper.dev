@@ -1,10 +1,11 @@
 'use client'
+import type { SignUpResponse } from '@/actions/users'
 
 import { useFormStatus, useFormState } from 'react-dom'
 import { useRouter } from 'next/navigation'
 
 import { SubmitButton, CancelButton } from '@/components/Buttons'
-import { SignUpResponse, submitSignUp } from '@/actions/users'
+import { submitSignUp } from '@/actions/users'
 import { ErrorMessage } from '@/components/Errors'
 
 const initialState: SignUpResponse = {

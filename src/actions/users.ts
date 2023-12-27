@@ -1,5 +1,7 @@
 'use server'
 
+import type { User, LoginData } from '@/types/users'
+
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import jwt, { JwtPayload } from 'jsonwebtoken'
@@ -7,8 +9,6 @@ import Debug from 'debug'
 import Dotenv from 'dotenv'
 
 import { cookies } from 'next/headers'
-
-import { User, LoginData } from '@/types/users'
 import { getDB } from './db'
 import { aSync, getInputData } from '@/utils'
 
