@@ -37,7 +37,7 @@ export default function Login() {
           id='username'
           name='username'
           type='text'
-          value={username}
+          defaultValue={username}
           required
         />
 

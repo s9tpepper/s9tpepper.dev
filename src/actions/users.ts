@@ -2,7 +2,8 @@
 
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
-import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import Debug from 'debug'
 import Dotenv from 'dotenv'
 
 import { cookies } from 'next/headers'
@@ -13,6 +14,7 @@ import { aSync, getInputData } from '@/utils'
 
 Dotenv.config()
 
+const debug = Debug('s9tpepper:actions')
 const SALT_ROUNDS = 13
 
 const { JWT_SECRET = 'santaisreal' } = process.env
@@ -29,13 +31,19 @@ export type LoginResponse = {
   user?: User | undefined | null
 }
 
-const getPasswordHash = async (username: string) => {
+const getPasswordHash = async (username: string): Promise<string> => {
+  const _d = debug.extend('getPasswordHash')
   const db = getDB()
   const users = db.collection<User>('users')
-  const user = await users.findOne<User>(
-    { username },
-    { projection: { password: 1 } }
+  const [error, user] = await aSync(
+    users.findOne<User>({ username }, { projection: { password: 1 } })
   )
+
+  if (error) {
+    _d(`error.message: ${error.message}`)
+    _d(error.stack)
+    return ''
+  }
 
   return user?.password
 }
@@ -48,6 +56,22 @@ const getErrorResponse = (error: string) => {
   return {
     success: false,
     error,
+  }
+}
+
+export async function validateJWT(
+  token: string
+): Promise<JwtPayload | boolean> {
+  try {
+    const payload = jwt.verify(token, JWT_SECRET)
+
+    if (typeof payload === 'string') {
+      return false
+    }
+
+    return payload
+  } catch (error) {
+    return false
   }
 }
 
