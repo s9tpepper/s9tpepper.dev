@@ -4,4 +4,4 @@ const url = 'mongodb://localhost:27017'
 const mongoClient = new MongoClient(url)
 const db = mongoClient.db('s9tpepper')
 const collection = db.collection('article')
-console.log(await collection.findOne({ slug: 'slug' }))
+console.log(await collection.findOne({ _id: 'slug' }))

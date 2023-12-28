@@ -45,6 +45,11 @@ export default async function Compose({ params }: ComposeParams) {
   let articleToEdit: PostArticleResponse = DEFAULT_STATE
   if (slug && Array.isArray(slug)) {
     articleToEdit = await getArticleBySlug(slug.join('/'))
+
+    if (articleToEdit.article && articleToEdit.article._id) {
+      articleToEdit.article._id = articleToEdit.article._id.toString()
+    }
+
     debug(`Got article by slug: ${JSON.stringify(articleToEdit)}`)
   }
 

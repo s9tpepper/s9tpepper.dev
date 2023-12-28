@@ -9,18 +9,23 @@ import { getDB } from './db'
 import { getInputData } from '@/utils'
 import { aSync } from '@/utils'
 // import { Collection, ObjectId, WithId } from 'mongodb'
-import { Db, MongoClient, Collection, WithId } from 'mongodb'
+import { Db, MongoClient, Collection, WithId, ObjectId } from 'mongodb'
 
 const debug = Debug('s9tpepper:actions:articles')
 
 export type Article = {
-  _id?: string
+  _id?: string | ObjectId
   slug: string
   title: string
   writer?: string
   created: Date
   content?: string
 }
+
+export type CheckSlugResponse = {
+  available: boolean
+  slug: string
+} & Response
 
 export type PostArticleResponse = {
   article?: Article
@@ -32,6 +37,7 @@ export type GetArticleResponse = {
 
 const getArticle = (inputData: FormValues): Article => {
   const article: Article = {
+    _id: new ObjectId(inputData?._id),
     title: inputData?.title,
     slug: inputData?.slug,
     writer: inputData?.writer,
@@ -68,6 +74,34 @@ const createArticle = async (
   }
 }
 
+export async function checkSlugAvailability(
+  slug: string
+): Promise<CheckSlugResponse> {
+  const _d = debug.extend('checkSlugAvailability')
+  const db = getDB()
+  const collection = db.collection<Article>('article')
+  const [error, checkResponse] = await aSync(
+    collection.findOne({ slug }, { projection: { slug: 1 } })
+  )
+
+  _d(`checkResponse: ${JSON.stringify(checkResponse)}`)
+
+  if (error) {
+    return {
+      success: false,
+      error: error?.message,
+      available: false,
+      slug,
+    }
+  }
+
+  return {
+    success: true,
+    available: checkResponse === null,
+    slug,
+  }
+}
+
 export async function getArticleBySlug(
   slug: string
 ): Promise<GetArticleResponse> {
@@ -79,7 +113,7 @@ export async function getArticleBySlug(
   _d(`collection: ${collection.namespace}`)
 
   const [error, articleResponse] = await aSync(
-    collection.findOne<Article>({ _id: slug })
+    collection.findOne<Article>({ slug })
   )
 
   _d(`articleResponse: ${JSON.stringify(articleResponse)}`)
@@ -105,19 +139,22 @@ export async function postArticle(
   const _d = debug.extend('postArticle')
   const inputData = getInputData(formData)
   const articleData = getArticle(inputData)
-  if (!articleData._id) {
-    articleData._id = articleData.slug
-  }
 
   const db = getDB()
   const collection = db.collection<Article>('article')
 
-  const filter = { slug: articleData.slug }
+  const $set = JSON.parse(JSON.stringify(articleData))
+  delete $set._id
+
+  const filter = articleData?._id ? { _id: articleData._id } : articleData
+
+  _d(`$set: ${JSON.stringify($set)}`)
   _d(`filter: ${JSON.stringify(filter)}`)
+
   const [error, articleResponse] = await aSync(
     collection.updateOne(
       filter,
-      { $set: articleData },
+      { $set },
       {
         upsert: true,
       }
@@ -136,6 +173,10 @@ export async function postArticle(
 
   if (!articleData._id) {
     articleData._id = insertedId
+  }
+
+  if (articleData._id) {
+    articleData._id = articleData._id.toString()
   }
 
   return {
