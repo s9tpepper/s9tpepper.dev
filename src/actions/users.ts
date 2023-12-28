@@ -1,6 +1,7 @@
 'use server'
 
 import type { User, LoginData } from '@/types/users'
+import type { Response } from '@/types/utils'
 
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
@@ -20,16 +21,12 @@ const SALT_ROUNDS = 13
 const { JWT_SECRET = 'santaisreal' } = process.env
 
 export type SignUpResponse = {
-  success: boolean
-  error?: string | undefined | null
   user?: User | undefined | null
-}
+} & Response
 
 export type LoginResponse = {
-  success: boolean
-  error?: string | undefined | null
   user?: User | undefined | null
-}
+} & Response
 
 const getPasswordHash = async (username: string): Promise<string> => {
   const _d = debug.extend('getPasswordHash')

@@ -3,7 +3,7 @@ import type { LoginResponse } from '@/actions/users'
 import type { User, LoginData } from '@/types/users'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useFormStatus, useFormState } from 'react-dom'
+import { useFormState } from 'react-dom'
 
 import { submitLogin } from '@/actions/users'
 import { SubmitButton, CancelButton } from '@/components/Buttons'
