@@ -33,6 +33,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
   const router = useRouter()
   const params = useParams()
   const [post, setPost] = useState('')
+  const [dirty, setDirty] = useState(false)
   const [slugValid, setSlugValid] = useState(initialSlugState)
 
   const [formState, formAction] = useFormState(async function (
@@ -55,6 +56,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
     if (editorRef.current) {
       // formState.article.content = editorRef?.current?.getContent()
       setPost(editorRef.current.getContent())
+      setDirty(true)
     }
   }
 
@@ -89,6 +91,10 @@ export default function ArticleEditor(props: ArticleEditorProps) {
     }
   }
 
+  const onFormUpdate = () => {
+    setDirty(true)
+  }
+
   const tinyMceUrl = '/tinymce/tinymce.min.js'
 
   return (
@@ -99,7 +105,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
         type='text'
         value={post}
         hidden
-        onChange={noop}
+        onChange={onFormUpdate}
       />
       <input
         id='_id'
@@ -107,7 +113,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
         type='text'
         value={formState?.article?._id as string}
         hidden
-        onChange={noop}
+        onChange={onFormUpdate}
       />
       <label htmlFor='title'>Title:</label>
       <input
@@ -115,7 +121,16 @@ export default function ArticleEditor(props: ArticleEditorProps) {
         name='title'
         type='text'
         value={formState?.article?.title}
-        onChange={noop}
+        onChange={onFormUpdate}
+        required
+      />
+      <label htmlFor='category'>Category:</label>
+      <input
+        id='category'
+        name='category'
+        type='text'
+        value={formState?.article?.category}
+        onChange={onFormUpdate}
         required
       />
       <label htmlFor='slug'>Slug:</label>
@@ -127,7 +142,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
         onChange={onSlugChange}
         required
       />
-      <SubmitButton label='Submit New Post' enabled={slugValid} />
+      <SubmitButton label='Submit New Post' enabled={slugValid || dirty} />
       <Editor
         id='editor'
         tinymceScriptSrc={tinyMceUrl}

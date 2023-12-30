@@ -20,6 +20,7 @@ export type Article = {
   writer?: string
   created: Date
   content?: string
+  category: string
 }
 
 export type CheckSlugResponse = {
@@ -35,6 +36,10 @@ export type GetArticleResponse = {
   article?: Article
 } & Response
 
+export type GetArticlesResponse = {
+  articles?: Article[]
+} & Response
+
 const getArticle = (inputData: FormValues): Article => {
   const article: Article = {
     _id: new ObjectId(inputData?._id),
@@ -43,12 +48,32 @@ const getArticle = (inputData: FormValues): Article => {
     writer: inputData?.writer,
     created: new Date(inputData?.created),
     content: inputData?.content,
+    category: inputData?.category,
   }
 
   return article
 }
 
-export async function getArticles() {}
+export const getArticles = async (): Promise<GetArticlesResponse> => {
+  const _d = debug.extend('getArticles')
+  const db = getDB()
+  const collection = db.collection<Article>('article')
+  const cursor = collection.find<Article>()
+
+  const [error, articles] = await aSync(cursor.toArray<Article>())
+
+  if (error) {
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+
+  return {
+    success: true,
+    articles,
+  }
+}
 
 const createArticle = async (
   collection: Collection<Article>,
@@ -124,6 +149,12 @@ export async function getArticleBySlug(
       success: false,
       error: error?.message,
     }
+  }
+
+  if (articleResponse._id) {
+    _d('Converting _id to string...')
+    articleResponse._id = articleResponse._id.toString()
+    _d(typeof articleResponse._id)
   }
 
   return {
