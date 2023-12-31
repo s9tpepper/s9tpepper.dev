@@ -23,21 +23,21 @@ export default function Header(props: HeaderProps) {
   return (
     <header className={styles.header}>
       <h1 className={styles.h1}>
-        <a className='link link-hover' href='/'>
+        <a className='link hover:link-hover' href='/'>
           s9tpepper.dev
         </a>
       </h1>
       <p className={styles.p}>
-        <a href='/coding' title='Coding' className='link-hover'>
+        <a href='/coding' title='Coding' className='hover:link-hover'>
           👨🏽‍💻
         </a>{' '}
-        <a href='/gardening' title='Gardening' className='link-hover'>
+        <a href='/gardening' title='Gardening' className='hover:link-hover'>
           👨🏽‍🌾
         </a>{' '}
-        <a href='/bbq' title='BBQ' className='link-hover'>
+        <a href='/bbq' title='BBQ' className='hover:link-hover'>
           🍖
         </a>{' '}
-        <a href='/games' title='Games' className='link-hover'>
+        <a href='/games' title='Games' className='hover:link-hover'>
           🎮
         </a>
       </p>

@@ -11,7 +11,7 @@ import { checkSlugAvailability, postArticle } from '@/actions/articles'
 
 import { SubmitButton } from '@/components/Buttons'
 
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { Editor } from '@tinymce/tinymce-react'
 import { Editor as TinyMCEEditor } from 'tinymce'
@@ -34,8 +34,10 @@ export default function ArticleEditor(props: ArticleEditorProps) {
   const params = useParams()
   const [post, setPost] = useState('')
   const [dirty, setDirty] = useState(false)
+  const [articleSlug, setArticleSlug] = useState(
+    initialFormState?.article?.slug
+  )
   const [slugValid, setSlugValid] = useState(initialSlugState)
-
   const [formState, formAction] = useFormState(async function (
     state: any,
     formData: FormData
@@ -49,32 +51,28 @@ export default function ArticleEditor(props: ArticleEditorProps) {
     return result
   }, initialFormState)
 
+  const hasBeenPosted =
+    initialFormState?.article?.slug && initialFormState?.article?._id
+  const viewArticleClasses = hasBeenPosted ? '' : 'hidden'
+
   const editorRef = useRef<TinyMCEEditor | null>(null)
-  const slugRef = useRef<HTMLInputElement | null>(null)
+  const submitButtonLabel = formState.article?.slug
+    ? 'Update Article'
+    : 'Create Article'
 
   const onEditorChange = (value: string, editor: TinyMCEEditor) => {
     if (editorRef.current) {
-      // formState.article.content = editorRef?.current?.getContent()
       setPost(editorRef.current.getContent())
       setDirty(true)
     }
   }
 
-  const debugEditor = () => {
-    if (editorRef.current) {
-      console.log(editorRef.current.getContent())
-    }
-  }
-
   const onInitHandler = (_: any, editor: TinyMCEEditor) => {
     editorRef.current = editor
-
-    if (!slugRef.current) return
-
-    slugRef.current.value = formState?.article?.slug || ''
   }
 
   const onSlugChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const _d = debug.extend('onSlugChange')
     const newValue = event.target.value
     const isNewSlug =
       (params.slug && params.slug !== newValue) || (!params.slug && !slugValid)
@@ -82,12 +80,10 @@ export default function ArticleEditor(props: ArticleEditorProps) {
     if (isNewSlug) {
       const slugCheckResponse = await checkSlugAvailability(newValue)
       const { available } = slugCheckResponse
+      _d(`available: ${available}`)
 
       setSlugValid(available)
-      if (newValue && slugRef && slugRef.current) {
-        const input = slugRef.current as HTMLInputElement
-        input.value = newValue
-      }
+      setArticleSlug(newValue)
     }
   }
 
@@ -99,6 +95,14 @@ export default function ArticleEditor(props: ArticleEditorProps) {
 
   return (
     <form action={formAction}>
+      <input
+        id='created'
+        name='created'
+        type='text'
+        value={formState?.article?.created}
+        hidden
+        onChange={onFormUpdate}
+      />
       <input
         id='content'
         name='content'
@@ -138,11 +142,18 @@ export default function ArticleEditor(props: ArticleEditorProps) {
         id='slug'
         name='slug'
         type='text'
-        ref={slugRef}
+        value={articleSlug}
         onChange={onSlugChange}
         required
       />
-      <SubmitButton label='Submit New Post' enabled={slugValid || dirty} />
+      <SubmitButton label={submitButtonLabel} enabled={slugValid || dirty} />
+      <a
+        target='_blank'
+        className={viewArticleClasses}
+        href={`/${articleSlug}`}
+      >
+        View Article
+      </a>
       <Editor
         id='editor'
         tinymceScriptSrc={tinyMceUrl}

@@ -2,9 +2,10 @@ import Debug from 'debug'
 
 import { getArticleBySlug } from '@/actions/articles'
 
-import { aSync } from '@/utils'
+import { aSync, headerStyles } from '@/utils'
 import { notFound, useRouter } from 'next/navigation'
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary'
+
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 
@@ -38,6 +39,7 @@ export default async function Article({ params }: ArticleParams) {
 
   debug(`----- articleResponse: ${JSON.stringify(articleResponse)}`)
   debug(`title: ${title}`)
+  debug(`date: ${date}`)
 
   const styles = {
     header:

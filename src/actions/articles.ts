@@ -120,10 +120,34 @@ export async function checkSlugAvailability(
     }
   }
 
+  const available = checkResponse === null
+  _d(`available: ${available}`)
+
   return {
     success: true,
-    available: checkResponse === null,
+    available,
     slug,
+  }
+}
+
+export async function getArticlesByCategory(
+  category: string
+): Promise<GetArticlesResponse> {
+  const db = getDB()
+  const collection = db.collection<Article>('article')
+  const cursor = collection.find<Article>({ category })
+
+  const [error, articles] = await aSync(cursor.toArray<Article>())
+  if (error) {
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+
+  return {
+    success: true,
+    articles,
   }
 }
 
@@ -151,11 +175,20 @@ export async function getArticleBySlug(
     }
   }
 
+  if (!articleResponse) {
+    return {
+      success: true,
+      article: null,
+    }
+  }
+
   if (articleResponse._id) {
     _d('Converting _id to string...')
     articleResponse._id = articleResponse._id.toString()
     _d(typeof articleResponse._id)
   }
+
+  articleResponse.created = new Date(articleResponse.created)
 
   return {
     success: true,
@@ -176,6 +209,13 @@ export async function postArticle(
 
   const $set = JSON.parse(JSON.stringify(articleData))
   delete $set._id
+
+  if (!$set.created) {
+    $set.created = new Date()
+  } else {
+    $set.created = new Date($set.created)
+    $set.updated = new Date()
+  }
 
   const filter = articleData?._id ? { _id: articleData._id } : articleData
 

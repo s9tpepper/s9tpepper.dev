@@ -35,8 +35,11 @@ export default async function Dashboard() {
           className='grid grid-flow-col grid-cols-[1fr_auto] justify-stretch'
         >
           <span className='w-full'>{article.title}</span>
-          <span className='text-xs align-items-end'>
-            {article.created.toLocaleDateString('en-us', {
+          <span className='text-sm w-[100px] pl-4 pr-4'>
+            {article.category}
+          </span>
+          <span className='text-xs text-right align-items-end w-[175px]'>
+            {new Date(article.created).toLocaleDateString('en-us', {
               weekday: 'long',
               year: 'numeric',
               month: 'short',

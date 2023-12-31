@@ -24,6 +24,7 @@
     "next": "14.0.3",
     "react": "^18",
     "react-dom": "^18",
+    "string-strip-html": "^13.4.4",
     "tinymce": "^6.8.0",
     "zlib": "^1.0.5"
   },
