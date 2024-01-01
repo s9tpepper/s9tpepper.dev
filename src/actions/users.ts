@@ -11,7 +11,8 @@ import Dotenv from 'dotenv'
 
 import { cookies } from 'next/headers'
 import { getDB } from './db'
-import { aSync, getInputData } from '@/utils'
+import { ARTICLE_ERRORS, aSync, getInputData } from '@/utils'
+import { redirect } from 'next/navigation'
 
 Dotenv.config()
 
@@ -178,4 +179,27 @@ export async function submitSignUp(
   delete inputData.role
 
   return { success: true, user }
+}
+
+export const checkAuthorization = async () => {
+  const _d = debug.extend('checkAuthorization')
+  const axe = cookies().get('axe')
+  if (!axe) {
+    return redirect('/')
+  }
+
+  const valid = await validateJWT(axe.value)
+  _d(`valid: ${valid}`)
+  if (!valid) {
+    return redirect('/')
+  }
+
+  if (valid && valid.user.role !== 'admin') {
+    return {
+      success: false,
+      error: ARTICLE_ERRORS.NOT_AUTHORIZED,
+    }
+  }
+
+  return { success: true, user: valid.user }
 }

@@ -29,6 +29,7 @@ const DEFAULT_STATE: PostArticleResponse = {
     writer: '',
     created: new Date(),
     content: 'Start your new post here...',
+    category: '',
   },
 }
 

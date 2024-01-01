@@ -11,10 +11,25 @@ import { aSync } from '@/utils'
 
 import { Db, MongoClient, Collection, WithId, ObjectId } from 'mongodb'
 import { cookies } from 'next/headers'
-import { validateJWT } from './users'
+import { validateJWT, checkAuthorization } from './users'
 import { redirect } from 'next/navigation'
 
 const debug = Debug('s9tpepper:actions:articles')
+/*
+ *{"name":"Screenshot 2023-09-28 at 2.29.27 PM.png","size":67833,"key":"32359c1f-6a24-4d5c-add5-e518e334a442-vxm066.png","serverData":{"firstName":"Omar","lastName":"Gonzalez","username":"s9tpepper","password":"","role":"admin"},"url":"https://utfs.io/f/32359c1f-6a24-4d5c-add5-e518e334a442-vxm066.png"}
+ */
+export type UploadThingImage = {
+  name: string
+  size: number
+  key: string
+  serverData: {
+    firstName: string
+    lastName: string
+    username: string
+    role: string
+  }
+  url: string
+}
 
 export type Article = {
   _id?: string | ObjectId
@@ -24,6 +39,7 @@ export type Article = {
   created: Date
   content: string
   category: string
+  hero?: UploadThingImage
 }
 
 export type CheckSlugResponse = {
@@ -201,29 +217,6 @@ export async function getArticleBySlug(
     success: true,
     article: articleResponse,
   }
-}
-
-const checkAuthorization = async () => {
-  const _d = debug.extend('checkAuthorization')
-  const axe = cookies().get('axe')
-  if (!axe) {
-    return redirect('/')
-  }
-
-  const valid = await validateJWT(axe.value)
-  _d(`valid: ${valid}`)
-  if (!valid) {
-    return redirect('/')
-  }
-
-  if (valid && valid.user.role !== 'admin') {
-    return {
-      success: false,
-      error: ARTICLE_ERRORS.NOT_AUTHORIZED,
-    }
-  }
-
-  return { success: true }
 }
 
 export async function postArticle(

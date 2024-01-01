@@ -18,6 +18,8 @@ import { Editor } from '@tinymce/tinymce-react'
 import { Editor as TinyMCEEditor } from 'tinymce'
 import { redirect, useParams, useRouter } from 'next/navigation'
 
+import { UploadButton } from '@/utils/uploadthing'
+
 const debug = Debug('s9tpepper:components:ArticleEditor')
 
 type ArticleEditorProps = {
@@ -154,6 +156,17 @@ export default function ArticleEditor(props: ArticleEditorProps) {
           onChange={onSlugChange}
           className='p-2'
           required
+        />
+        <label>Upload Hero Image:</label>
+        <UploadButton
+          endpoint='imageUploader'
+          onClientUploadComplete={(res) => {
+            debug(`Files: ${JSON.stringify(res)}`)
+          }}
+          onUploadError={(error: Error) => {
+            debug(`error: error.message`)
+            debug(error.stack)
+          }}
         />
       </div>
       <form action={formAction} className='max-w-[90%] ml-auto mr-auto pb-32'>
