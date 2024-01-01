@@ -56,17 +56,25 @@ const getErrorResponse = (error: string) => {
   }
 }
 
+type JwtPayloadValidation = {
+  user: User
+  iat: number
+  exp: number
+}
+
 export async function validateJWT(
   token: string
-): Promise<JwtPayload | boolean> {
+): Promise<JwtPayloadValidation | false> {
+  const _d = debug.extend('validateJWT')
   try {
     const payload = jwt.verify(token, JWT_SECRET)
+    _d(`payload: ${JSON.stringify(payload)}`)
 
     if (typeof payload === 'string') {
       return false
     }
 
-    return payload
+    return payload as JwtPayloadValidation
   } catch (error) {
     return false
   }

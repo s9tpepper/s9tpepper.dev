@@ -6,9 +6,9 @@ import type { Response } from '@/types/utils'
 import type { FormValues } from '@/utils'
 
 import { getDB } from './db'
-import { getInputData } from '@/utils'
+import { ARTICLE_ERRORS, getInputData } from '@/utils'
 import { aSync } from '@/utils'
-// import { Collection, ObjectId, WithId } from 'mongodb'
+
 import { Db, MongoClient, Collection, WithId, ObjectId } from 'mongodb'
 import { cookies } from 'next/headers'
 import { validateJWT } from './users'
@@ -61,9 +61,9 @@ export const getArticles = async (): Promise<GetArticlesResponse> => {
   const _d = debug.extend('getArticles')
   const db = getDB()
   const collection = db.collection<Article>('article')
-  const cursor = collection.find<Article>()
+  const cursor = collection.find<Article>({})
 
-  const [error, articles] = await aSync(cursor.toArray<Article>())
+  const [error, articles] = await aSync(cursor.toArray())
 
   if (error) {
     return {
@@ -145,7 +145,7 @@ export async function getArticlesByCategory(
   const collection = db.collection<Article>('article')
   const cursor = collection.find<Article>({ category })
 
-  const [error, articles] = await aSync(cursor.toArray<Article>())
+  const [error, articles] = await aSync(cursor.toArray())
   if (error) {
     return {
       success: false,
@@ -186,7 +186,6 @@ export async function getArticleBySlug(
   if (!articleResponse) {
     return {
       success: true,
-      article: null,
     }
   }
 
@@ -205,12 +204,14 @@ export async function getArticleBySlug(
 }
 
 const checkAuthorization = async () => {
+  const _d = debug.extend('checkAuthorization')
   const axe = cookies().get('axe')
   if (!axe) {
     return redirect('/')
   }
 
   const valid = await validateJWT(axe.value)
+  _d(`valid: ${valid}`)
   if (!valid) {
     return redirect('/')
   }

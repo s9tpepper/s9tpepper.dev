@@ -15,6 +15,7 @@
     "@types/debug": "^4.1.12",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/tinymce": "^4.6.9",
+    "@uploadthing/react": "^6.0.2",
     "bcrypt": "^5.1.1",
     "debug": "^4.3.4",
     "dotenv": "^16.3.1",
@@ -26,6 +27,7 @@
     "react-dom": "^18",
     "string-strip-html": "^13.4.4",
     "tinymce": "^6.8.0",
+    "uploadthing": "^6.1.0",
     "zlib": "^1.0.5"
   },
   "devDependencies": {

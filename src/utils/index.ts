@@ -7,15 +7,11 @@ export const ARTICLE_ERRORS = {
 }
 
 export const aSync = (promise: Promise<any>): Promise<any> => {
-  const _d = debug.extend('aSync')
   return promise
     .then((result) => {
-      _d(result)
-      _d(`result: ${JSON.stringify(result)}`)
       return [null, result]
     })
     .catch((error) => {
-      _d(`error: ${JSON.stringify(error)}`)
       return [error, null]
     })
 }
