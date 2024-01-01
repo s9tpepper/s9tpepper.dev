@@ -8,11 +8,13 @@ const debug = Debug('s9tpepper:components:Buttons')
 type ButtonClick = MouseEventHandler<HTMLButtonElement>
 
 type SubmitButtonProps = {
+  className?: string
   label?: string
   enabled?: boolean
 }
 
 export function SubmitButton({
+  className = '',
   label = 'Submit',
   enabled = true,
 }: SubmitButtonProps) {
@@ -26,6 +28,7 @@ export function SubmitButton({
   return (
     <button
       type='submit'
+      className={className}
       disabled={enabled === false || pending}
       aria-disabled={enabled === false || pending}
     >
@@ -34,6 +37,11 @@ export function SubmitButton({
   )
 }
 
-export function CancelButton({ cancel }: { cancel: ButtonClick }) {
-  return <button onClick={cancel}>Cancel</button>
+type CancelButtonProps = { cancel: ButtonClick; className?: string }
+export function CancelButton({ cancel, className }: CancelButtonProps) {
+  return (
+    <button className={className} onClick={cancel}>
+      Cancel
+    </button>
+  )
 }

@@ -2,6 +2,10 @@ import Debug from 'debug'
 
 const debug = Debug('s9tpepper:utils')
 
+export const ARTICLE_ERRORS = {
+  NOT_AUTHORIZED: 'Not authorized',
+}
+
 export const aSync = (promise: Promise<any>): Promise<any> => {
   const _d = debug.extend('aSync')
   return promise

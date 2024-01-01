@@ -8,6 +8,7 @@ import type {
 import Debug from 'debug'
 
 import { checkSlugAvailability, postArticle } from '@/actions/articles'
+import { ARTICLE_ERRORS } from '@/utils'
 
 import { SubmitButton } from '@/components/Buttons'
 
@@ -15,7 +16,7 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { Editor } from '@tinymce/tinymce-react'
 import { Editor as TinyMCEEditor } from 'tinymce'
-import { useParams, useRouter } from 'next/navigation'
+import { redirect, useParams, useRouter } from 'next/navigation'
 
 const debug = Debug('s9tpepper:components:ArticleEditor')
 
@@ -43,13 +44,25 @@ export default function ArticleEditor(props: ArticleEditorProps) {
     formData: FormData
   ) {
     const result = await postArticle(state, formData)
-    const { article: { slug: newSlug } = {} } = result
-    if (params.slug !== newSlug) {
+    const { success, article: { slug: newSlug } = {} } = result
+
+    // Only update the browser's slug if the postArticle was successful
+    if (success && params.slug !== newSlug) {
       router.replace(`/dashboard/compose/${newSlug}`)
     }
 
     return result
   }, initialFormState)
+
+  const submissionError =
+    !formState.success && formState?.error ? formState.error : false
+
+  // If there was a Not authorized error, send to home page
+  if (submissionError && submissionError === ARTICLE_ERRORS.NOT_AUTHORIZED) {
+    setTimeout(() => {
+      router.replace('/')
+    }, 3000)
+  }
 
   const hasBeenPosted =
     initialFormState?.article?.slug && initialFormState?.article?._id
@@ -94,105 +107,108 @@ export default function ArticleEditor(props: ArticleEditorProps) {
   const tinyMceUrl = '/tinymce/tinymce.min.js'
 
   return (
-    <form action={formAction}>
-      <input
-        id='created'
-        name='created'
-        type='text'
-        value={formState?.article?.created}
-        hidden
-        onChange={onFormUpdate}
-      />
-      <input
-        id='content'
-        name='content'
-        type='text'
-        value={post}
-        hidden
-        onChange={onFormUpdate}
-      />
-      <input
-        id='_id'
-        name='_id'
-        type='text'
-        value={formState?.article?._id as string}
-        hidden
-        onChange={onFormUpdate}
-      />
-      <label htmlFor='title'>Title:</label>
-      <input
-        id='title'
-        name='title'
-        type='text'
-        value={formState?.article?.title}
-        onChange={onFormUpdate}
-        required
-      />
-      <label htmlFor='category'>Category:</label>
-      <input
-        id='category'
-        name='category'
-        type='text'
-        value={formState?.article?.category}
-        onChange={onFormUpdate}
-        required
-      />
-      <label htmlFor='slug'>Slug:</label>
-      <input
-        id='slug'
-        name='slug'
-        type='text'
-        value={articleSlug}
-        onChange={onSlugChange}
-        required
-      />
-      <SubmitButton label={submitButtonLabel} enabled={slugValid || dirty} />
-      <a
-        target='_blank'
-        className={viewArticleClasses}
-        href={`/${articleSlug}`}
-      >
-        View Article
-      </a>
-      <Editor
-        id='editor'
-        tinymceScriptSrc={tinyMceUrl}
-        onEditorChange={onEditorChange}
-        onInit={onInitHandler}
-        initialValue={formState.article?.content}
-        init={{
-          skin: 'oxide-dark',
-          content_css: 'tinymce-5-dark',
-          height: 500,
-          menubar: true,
-          plugins: [
-            'advlist',
-            'autolink',
-            'lists',
-            'link',
-            'image',
-            'charmap',
-            'anchor',
-            'searchreplace',
-            'visualblocks',
-            'code',
-            'fullscreen',
-            'insertdatetime',
-            'media',
-            'table',
-            'preview',
-            'help',
-            'wordcount',
-          ],
-          toolbar:
-            'undo redo | blocks | ' +
-            'bold italic forecolor | alignleft aligncenter ' +
-            'alignright alignjustify | bullist numlist outdent indent | ' +
-            'removeformat | help',
-          content_style:
-            'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-        }}
-      />
-    </form>
+    <>
+      {submissionError && <div>{submissionError}</div>}
+      <form action={formAction}>
+        <input
+          id='created'
+          name='created'
+          type='text'
+          value={formState?.article?.created}
+          hidden
+          onChange={onFormUpdate}
+        />
+        <input
+          id='content'
+          name='content'
+          type='text'
+          value={post}
+          hidden
+          onChange={onFormUpdate}
+        />
+        <input
+          id='_id'
+          name='_id'
+          type='text'
+          value={formState?.article?._id as string}
+          hidden
+          onChange={onFormUpdate}
+        />
+        <label htmlFor='title'>Title:</label>
+        <input
+          id='title'
+          name='title'
+          type='text'
+          value={formState?.article?.title}
+          onChange={onFormUpdate}
+          required
+        />
+        <label htmlFor='category'>Category:</label>
+        <input
+          id='category'
+          name='category'
+          type='text'
+          value={formState?.article?.category}
+          onChange={onFormUpdate}
+          required
+        />
+        <label htmlFor='slug'>Slug:</label>
+        <input
+          id='slug'
+          name='slug'
+          type='text'
+          value={articleSlug}
+          onChange={onSlugChange}
+          required
+        />
+        <SubmitButton label={submitButtonLabel} enabled={slugValid || dirty} />
+        <a
+          target='_blank'
+          className={viewArticleClasses}
+          href={`/${articleSlug}`}
+        >
+          View Article
+        </a>
+        <Editor
+          id='editor'
+          tinymceScriptSrc={tinyMceUrl}
+          onEditorChange={onEditorChange}
+          onInit={onInitHandler}
+          initialValue={formState.article?.content}
+          init={{
+            skin: 'oxide-dark',
+            content_css: 'tinymce-5-dark',
+            height: 500,
+            menubar: true,
+            plugins: [
+              'advlist',
+              'autolink',
+              'lists',
+              'link',
+              'image',
+              'charmap',
+              'anchor',
+              'searchreplace',
+              'visualblocks',
+              'code',
+              'fullscreen',
+              'insertdatetime',
+              'media',
+              'table',
+              'preview',
+              'help',
+              'wordcount',
+            ],
+            toolbar:
+              'undo redo | blocks | ' +
+              'bold italic forecolor | alignleft aligncenter ' +
+              'alignright alignjustify | bullist numlist outdent indent | ' +
+              'removeformat | help',
+            content_style:
+              'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+          }}
+        />
+      </form>
+    </>
   )
 }

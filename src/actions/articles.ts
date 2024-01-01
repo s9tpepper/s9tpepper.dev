@@ -10,6 +10,9 @@ import { getInputData } from '@/utils'
 import { aSync } from '@/utils'
 // import { Collection, ObjectId, WithId } from 'mongodb'
 import { Db, MongoClient, Collection, WithId, ObjectId } from 'mongodb'
+import { cookies } from 'next/headers'
+import { validateJWT } from './users'
+import { redirect } from 'next/navigation'
 
 const debug = Debug('s9tpepper:actions:articles')
 
@@ -79,6 +82,11 @@ const createArticle = async (
   collection: Collection<Article>,
   articleData: Article
 ): Promise<PostArticleResponse> => {
+  const authorized = await checkAuthorization()
+  if (!authorized.success) {
+    return authorized
+  }
+
   const [error, articleResponse] = await aSync(
     collection.insertOne(articleData)
   )
@@ -196,11 +204,38 @@ export async function getArticleBySlug(
   }
 }
 
+const checkAuthorization = async () => {
+  const axe = cookies().get('axe')
+  if (!axe) {
+    return redirect('/')
+  }
+
+  const valid = await validateJWT(axe.value)
+  if (!valid) {
+    return redirect('/')
+  }
+
+  if (valid && valid.user.role !== 'admin') {
+    return {
+      success: false,
+      error: ARTICLE_ERRORS.NOT_AUTHORIZED,
+    }
+  }
+
+  return { success: true }
+}
+
 export async function postArticle(
   state: any,
   formData: FormData
 ): Promise<PostArticleResponse> {
   const _d = debug.extend('postArticle')
+
+  const authorized = await checkAuthorization()
+  if (!authorized.success) {
+    return authorized
+  }
+
   const inputData = getInputData(formData)
   const articleData = getArticle(inputData)
 
@@ -218,9 +253,6 @@ export async function postArticle(
   }
 
   const filter = articleData?._id ? { _id: articleData._id } : articleData
-
-  _d(`$set: ${JSON.stringify($set)}`)
-  _d(`filter: ${JSON.stringify(filter)}`)
 
   const [error, articleResponse] = await aSync(
     collection.updateOne(

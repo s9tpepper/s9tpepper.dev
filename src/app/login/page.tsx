@@ -31,8 +31,8 @@ export default function Login() {
   }
 
   return (
-    <main>
-      <form action={formAction}>
+    <main className='p-20'>
+      <form action={formAction} className='grid'>
         <label htmlFor='username'>Username:</label>
         <input
           id='username'
@@ -44,9 +44,9 @@ export default function Login() {
 
         <label htmlFor='password'>Password:</label>
         <input id='password' name='password' type='password' required />
-        <div>
-          <SubmitButton label='Log In' />
-          <CancelButton cancel={onClickHandler} />
+        <div className='grid grid-flow-col'>
+          <SubmitButton className='w-[100px]' label='Log In' />
+          <CancelButton className='w-[100px]' cancel={onClickHandler} />
           <a href='/forgot-password'>Forgot password?</a>
           <a href='/reset-password'>Reset password</a>
         </div>

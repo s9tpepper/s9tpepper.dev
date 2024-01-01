@@ -17,7 +17,7 @@ export default async function Dashboard() {
     return redirect('/')
   }
 
-  const valid = validateJWT(axe.value)
+  const valid = await validateJWT(axe.value)
   if (!valid) {
     return redirect('/')
   }
