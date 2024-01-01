@@ -25,6 +25,7 @@ type ArticleEditorProps = {
 }
 
 const noop = () => {}
+const buttonStyles = 'text-center bg-gray-900 hover:bg-gray-700 p-2 rounded'
 
 export default function ArticleEditor(props: ArticleEditorProps) {
   debug('Rendering ArticleEditor...')
@@ -66,7 +67,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
 
   const hasBeenPosted =
     initialFormState?.article?.slug && initialFormState?.article?._id
-  const viewArticleClasses = hasBeenPosted ? '' : 'hidden'
+  const viewArticleClasses = hasBeenPosted ? buttonStyles : 'hidden'
 
   const editorRef = useRef<TinyMCEEditor | null>(null)
   const submitButtonLabel = formState.article?.slug
@@ -109,7 +110,53 @@ export default function ArticleEditor(props: ArticleEditorProps) {
   return (
     <>
       {submissionError && <div>{submissionError}</div>}
-      <form action={formAction}>
+      <div className='grid grid-cols-6 gap-6 max-w-[90%] ml-auto mr-auto pb-6 pt-6'>
+        <SubmitButton
+          className={buttonStyles}
+          label={submitButtonLabel}
+          enabled={slugValid || dirty}
+        />
+        <a
+          target='_blank'
+          className={viewArticleClasses}
+          href={`/${articleSlug}`}
+        >
+          View Article
+        </a>
+      </div>
+      <div className='grid grid-cols-[auto_1fr] grid-rows-3 gap-2 max-w-[90%] ml-auto mr-auto pb-6'>
+        <label htmlFor='title'>Title:</label>
+        <input
+          id='title'
+          name='title'
+          type='text'
+          value={formState?.article?.title}
+          onChange={onFormUpdate}
+          className='p-2'
+          required
+        />
+        <label htmlFor='category'>Category:</label>
+        <input
+          id='category'
+          name='category'
+          type='text'
+          value={formState?.article?.category}
+          onChange={onFormUpdate}
+          className='p-2'
+          required
+        />
+        <label htmlFor='slug'>Slug:</label>
+        <input
+          id='slug'
+          name='slug'
+          type='text'
+          value={articleSlug}
+          onChange={onSlugChange}
+          className='p-2'
+          required
+        />
+      </div>
+      <form action={formAction} className='max-w-[90%] ml-auto mr-auto pb-32'>
         <input
           id='created'
           name='created'
@@ -134,41 +181,6 @@ export default function ArticleEditor(props: ArticleEditorProps) {
           hidden
           onChange={onFormUpdate}
         />
-        <label htmlFor='title'>Title:</label>
-        <input
-          id='title'
-          name='title'
-          type='text'
-          value={formState?.article?.title}
-          onChange={onFormUpdate}
-          required
-        />
-        <label htmlFor='category'>Category:</label>
-        <input
-          id='category'
-          name='category'
-          type='text'
-          value={formState?.article?.category}
-          onChange={onFormUpdate}
-          required
-        />
-        <label htmlFor='slug'>Slug:</label>
-        <input
-          id='slug'
-          name='slug'
-          type='text'
-          value={articleSlug}
-          onChange={onSlugChange}
-          required
-        />
-        <SubmitButton label={submitButtonLabel} enabled={slugValid || dirty} />
-        <a
-          target='_blank'
-          className={viewArticleClasses}
-          href={`/${articleSlug}`}
-        >
-          View Article
-        </a>
         <Editor
           id='editor'
           tinymceScriptSrc={tinyMceUrl}
