@@ -3,6 +3,7 @@
 import type {
   GetArticleResponse,
   PostArticleResponse,
+  UploadThingImage,
 } from '@/actions/articles'
 
 import Debug from 'debug'
@@ -36,17 +37,20 @@ export default function ArticleEditor(props: ArticleEditorProps) {
 
   const router = useRouter()
   const params = useParams()
-  const [post, setPost] = useState('')
   const [dirty, setDirty] = useState(false)
-  const [articleSlug, setArticleSlug] = useState(
-    initialFormState?.article?.slug
-  )
   const [slugValid, setSlugValid] = useState(initialSlugState)
+  const [formInputs, setFormInputs] = useState({ ...initialFormState.article })
+
+  const { article: { hero } = {} } = initialFormState
+
   const [formState, formAction] = useFormState(async function (
     state: any,
     formData: FormData
   ) {
+    const _d = debug.extend('formAction')
+    _d(`Running save code...`)
     const result = await postArticle(state, formData)
+    _d(`result: ${JSON.stringify(result)}`)
     const { success, article: { slug: newSlug } = {} } = result
 
     // Only update the browser's slug if the postArticle was successful
@@ -78,7 +82,14 @@ export default function ArticleEditor(props: ArticleEditorProps) {
 
   const onEditorChange = (value: string, editor: TinyMCEEditor) => {
     if (editorRef.current) {
-      setPost(editorRef.current.getContent())
+      // setPost(editorRef.current.getContent())
+      const newState = { ...formInputs }
+      const newValue = editorRef.current.getContent()
+      // TODO: figure out why TS is complaining about _id
+      // @ts-ignore
+      newState.content = newValue
+
+      setFormInputs(newState)
       setDirty(true)
     }
   }
@@ -96,14 +107,26 @@ export default function ArticleEditor(props: ArticleEditorProps) {
     if (isNewSlug) {
       const slugCheckResponse = await checkSlugAvailability(newValue)
       const { available } = slugCheckResponse
-      _d(`available: ${available}`)
-
       setSlugValid(available)
-      setArticleSlug(newValue)
+
+      const newState = { ...formInputs }
+      // TODO: figure out why TS is complaining about _id
+      // @ts-ignore
+      newState.slug = newValue
+
+      setFormInputs(newState)
     }
   }
 
-  const onFormUpdate = () => {
+  const onFormUpdate = (event: ChangeEvent<HTMLInputElement>) => {
+    const newState = { ...formInputs }
+    const newValue = event.target.value
+    const propName = event.target.name
+    // TODO: figure out why TS is complaining about _id
+    // @ts-ignore
+    newState[propName] = newValue
+
+    setFormInputs(newState)
     setDirty(true)
   }
 
@@ -112,69 +135,88 @@ export default function ArticleEditor(props: ArticleEditorProps) {
   return (
     <>
       {submissionError && <div>{submissionError}</div>}
-      <div className='grid grid-cols-6 gap-6 max-w-[90%] ml-auto mr-auto pb-6 pt-6'>
-        <SubmitButton
-          className={buttonStyles}
-          label={submitButtonLabel}
-          enabled={slugValid || dirty}
-        />
-        <a
-          target='_blank'
-          className={viewArticleClasses}
-          href={`/${articleSlug}`}
-        >
-          View Article
-        </a>
-      </div>
-      <div className='grid grid-cols-[auto_1fr] grid-rows-3 gap-2 max-w-[90%] ml-auto mr-auto pb-6'>
-        <label htmlFor='title'>Title:</label>
-        <input
-          id='title'
-          name='title'
-          type='text'
-          value={formState?.article?.title}
-          onChange={onFormUpdate}
-          className='p-2'
-          required
-        />
-        <label htmlFor='category'>Category:</label>
-        <input
-          id='category'
-          name='category'
-          type='text'
-          value={formState?.article?.category}
-          onChange={onFormUpdate}
-          className='p-2'
-          required
-        />
-        <label htmlFor='slug'>Slug:</label>
-        <input
-          id='slug'
-          name='slug'
-          type='text'
-          value={articleSlug}
-          onChange={onSlugChange}
-          className='p-2'
-          required
-        />
-        <label>Upload Hero Image:</label>
-        <UploadButton
-          endpoint='imageUploader'
-          onClientUploadComplete={(res) => {
-            debug(`Files: ${JSON.stringify(res)}`)
-          }}
-          onUploadError={(error: Error) => {
-            debug(`error: error.message`)
-            debug(error.stack)
-          }}
-        />
-      </div>
       <form action={formAction} className='max-w-[90%] ml-auto mr-auto pb-32'>
+        <div className='grid grid-cols-6 gap-6 max-w-[90%] ml-auto mr-auto pb-6 pt-6'>
+          <SubmitButton
+            className={buttonStyles}
+            label={submitButtonLabel}
+            enabled={slugValid || dirty}
+          />
+          <a
+            target='_blank'
+            className={viewArticleClasses}
+            href={`/${formInputs.slug}`}
+          >
+            View Article
+          </a>
+        </div>
+        <div className='grid grid-cols-[auto_1fr] grid-rows-3 gap-2 max-w-[90%] ml-auto mr-auto pb-6'>
+          <label htmlFor='title'>Title:</label>
+          <input
+            id='title'
+            name='title'
+            type='text'
+            value={formInputs?.title || ''}
+            onChange={onFormUpdate}
+            className='p-2'
+            required
+          />
+          <label htmlFor='category'>Category:</label>
+          <input
+            id='category'
+            name='category'
+            type='text'
+            value={formInputs?.category || ''}
+            onChange={onFormUpdate}
+            className='p-2'
+            required
+          />
+          <label htmlFor='slug'>Slug:</label>
+          <input
+            id='slug'
+            name='slug'
+            type='text'
+            value={formInputs?.slug || ''}
+            onChange={onSlugChange}
+            className='p-2'
+            required
+          />
+          <label>Upload Hero Image:</label>
+          <UploadButton
+            endpoint='imageUploader'
+            onClientUploadComplete={(res) => {
+              debug(`Files: ${JSON.stringify(res)}`)
+              const file = res[0]
+              debug('setting file...')
+              const newState = { ...formInputs }
+              // TODO: figure out why TS is complaining about _id
+              // @ts-ignore
+              newState.hero = file as UploadThingImage
+
+              setFormInputs(newState)
+              setDirty(true)
+
+              debug('file set.')
+            }}
+            onUploadError={(error: Error) => {
+              debug(`error: error.message`)
+              debug(error.stack)
+            }}
+          />
+        </div>
+        <input
+          id='hero'
+          name='hero'
+          type='current'
+          hidden
+          value={formInputs.hero ? JSON.stringify(formInputs.hero) : ''}
+          onChange={noop}
+        />
         <input
           id='created'
           name='created'
           type='text'
-          value={formState?.article?.created?.toISOString()}
+          value={formInputs?.created?.toISOString()}
           hidden
           onChange={onFormUpdate}
         />
@@ -182,7 +224,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
           id='content'
           name='content'
           type='text'
-          value={post}
+          value={formInputs?.content || ''}
           hidden
           onChange={onFormUpdate}
         />
@@ -190,7 +232,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
           id='_id'
           name='_id'
           type='text'
-          value={formState?.article?._id as string}
+          value={(formInputs?._id as string) || ''}
           hidden
           onChange={onFormUpdate}
         />

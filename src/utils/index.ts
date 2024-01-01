@@ -18,6 +18,7 @@ export const aSync = (promise: Promise<any>): Promise<any> => {
 
 export type FormValues = { [key: string]: string }
 export function getInputData(formData: FormData) {
+  const _d = debug.extend('getInputData')
   const formKeys = Array.from(formData.keys())
   const inputData = formKeys.reduce((inputs: FormValues, key: string) => {
     if (!key) return inputs
@@ -30,6 +31,8 @@ export function getInputData(formData: FormData) {
 
     return inputs
   }, {})
+
+  _d(`inputData: ${JSON.stringify(inputData)}`)
 
   return inputData
 }

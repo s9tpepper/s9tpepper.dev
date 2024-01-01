@@ -68,6 +68,7 @@ const getArticle = (inputData: FormValues): Article => {
     created: new Date(inputData?.created),
     content: inputData?.content,
     category: inputData?.category,
+    hero: JSON.parse(inputData?.hero),
   }
 
   return article
@@ -257,9 +258,12 @@ export async function postArticle(
       }
     )
   )
+
+  _d(`error: ${error}`)
   _d(`error.message: ${error?.message}`)
 
   if (error) {
+    _d('Returning an error message')
     return {
       success: false,
       error: error.message,
