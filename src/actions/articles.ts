@@ -20,9 +20,9 @@ export type Article = {
   _id?: string | ObjectId
   slug: string
   title: string
-  writer?: string
+  writer: string
   created: Date
-  content?: string
+  content: string
   category: string
 }
 

@@ -161,7 +161,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
           id='created'
           name='created'
           type='text'
-          value={formState?.article?.created}
+          value={formState?.article?.created?.toISOString()}
           hidden
           onChange={onFormUpdate}
         />
