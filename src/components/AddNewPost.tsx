@@ -8,5 +8,9 @@ export function AddNewPost() {
     router.push('/dashboard/compose')
   }
 
-  return <button onClick={onNewPostClick}>New Post</button>
+  return (
+    <button className='bg-gray-900 hover:bg-gray-700 p-2 rounded' onClick={onNewPostClick}>
+      New Post
+    </button>
+  )
 }

@@ -28,7 +28,7 @@ export default async function Dashboard() {
     return (
       <li
         key={article.slug}
-        className='p-2 border border-b-solid border-green-400 hover:bg-green-600'
+        className='p-2 border border-b-solid border-green-400 hover:bg-green-900'
       >
         <a
           href={`/dashboard/compose/${article.slug}`}
@@ -53,8 +53,12 @@ export default async function Dashboard() {
 
   return (
     <main className='p-14'>
-      <AddNewPost />
-      <h2 className='text-xl font-bold w-full'>Articles List</h2>
+      <div className='grid grid-flow-col justify-end'>
+        <AddNewPost />
+      </div>
+      <h2 className='text-green-400 text-2xl font-bold w-full pb-6'>
+        Articles List
+      </h2>
       <ul className='border border-solid border-green-400 border-b-0'>
         {articles}
       </ul>
