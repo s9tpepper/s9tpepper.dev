@@ -24,6 +24,7 @@ html {
 body {
   width: 100%;
   height: 100%;
+  overflow-x: hidden;
   @apply max-w-5xl ml-auto mr-auto bg-gradient-to-r from-gray-800 to-gray-900 text-white;
 }
 
@@ -35,7 +36,12 @@ input, select, textarea {
   @apply hover:text-green-400 transition-all duration-300;
 }
 
-
+.footer {
+  position: relative;
+  width: 100vw;
+  margin: 0 0 0 -50vw;
+  left: 50%;
+}
 
 .article-main h1 {
 }
