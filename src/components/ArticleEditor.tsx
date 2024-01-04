@@ -136,7 +136,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
     <>
       {submissionError && <div>{submissionError}</div>}
       <form action={formAction} className='max-w-[90%] ml-auto mr-auto pb-32'>
-        <div className='grid grid-cols-6 gap-6 max-w-[90%] ml-auto mr-auto pb-6 pt-6'>
+        <div className='grid grid-cols-4 gap-6 max-w-[90%] ml-auto mr-auto pb-6 pt-6'>
           <SubmitButton
             className={buttonStyles}
             label={submitButtonLabel}
@@ -150,7 +150,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
             View Article
           </a>
         </div>
-        <div className='grid grid-cols-[auto_1fr] grid-rows-3 gap-2 max-w-[90%] ml-auto mr-auto pb-6'>
+        <div className='grid grid-cols-[auto_1fr] grid-rows-auto gap-2 max-w-[90%] ml-auto mr-auto pb-6'>
           <label htmlFor='title'>Title:</label>
           <input
             id='title'
@@ -183,6 +183,9 @@ export default function ArticleEditor(props: ArticleEditorProps) {
           />
           <label>Upload Hero Image:</label>
           <UploadButton
+            appearance={{
+              button: 'flex flex-col gap-1 self-start',
+            }}
             endpoint='imageUploader'
             onClientUploadComplete={(res) => {
               debug(`Files: ${JSON.stringify(res)}`)
@@ -204,8 +207,26 @@ export default function ArticleEditor(props: ArticleEditorProps) {
             }}
           />
 
-          <div>
-            <img alt='' src={formInputs?.hero?.url || ''} />
+          <div className='w-full col-start-2 col-end-3'>
+            <img
+              className='w-[320px] h-[160px] border border-0 rounded-md col-start-2 col-end-3'
+              alt=''
+              src={formInputs?.hero?.url || ''}
+            />
+          </div>
+          <div className='w-full row-start-6 row-end-7'>
+            <label>Upload Article Image:</label>
+            <UploadButton
+              endpoint='imageUploader'
+              onClientUploadComplete={(res) => {
+                const file = res[0]
+                alert(file.url)
+              }}
+              onUploadError={(error: Error) => {
+                debug(`error: error.message`)
+                debug(error.stack)
+              }}
+            />
           </div>
         </div>
         <input
@@ -278,6 +299,11 @@ export default function ArticleEditor(props: ArticleEditorProps) {
             content_style:
               'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
           }}
+        />
+        <SubmitButton
+          className={`${buttonStyles} mt-4`}
+          label={submitButtonLabel}
+          enabled={slugValid || dirty}
         />
       </form>
     </>
