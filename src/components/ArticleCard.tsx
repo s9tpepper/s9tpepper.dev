@@ -30,11 +30,13 @@ export default function ArticleCard(props: ArticleCardProps) {
             day: 'numeric',
           })}
         </span>
-        <img
-          className='mt-4 mb-4 w-[320px] h-[160px] object-cover rounded-md border border-0'
-          src={article?.hero?.url || '/fpo.png'}
-          alt=''
-        />
+        <div>
+          <img
+            className='mt-4 mb-4 w-full h-[160px] object-cover rounded-md border border-0'
+            src={article?.hero?.url || '/fpo.png'}
+            alt=''
+          />
+        </div>
         <p className='text-xs'>{excerpt}...</p>
       </a>
     </article>

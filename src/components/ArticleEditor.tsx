@@ -209,7 +209,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
 
           <div className='w-full col-start-2 col-end-3'>
             <img
-              className='w-[320px] h-[160px] border border-0 rounded-md col-start-2 col-end-3'
+              className='mt-4 mb-4 w-[320px] h-[160px] object-cover border border-0 rounded-md col-start-2 col-end-3'
               alt=''
               src={formInputs?.hero?.url || ''}
             />
