@@ -203,6 +203,10 @@ export default function ArticleEditor(props: ArticleEditorProps) {
               debug(error.stack)
             }}
           />
+
+          <div>
+            <img alt='' src={formInputs?.hero?.url || ''} />
+          </div>
         </div>
         <input
           id='hero'
