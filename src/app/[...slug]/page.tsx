@@ -8,6 +8,7 @@ import { ErrorBoundary } from 'next/dist/client/components/error-boundary'
 
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
+import Link from '@/components/Link'
 
 const debug = Debug('s9tpepper:catchAll')
 
@@ -34,7 +35,7 @@ export default async function Article({ params }: ArticleParams) {
   }
 
   const {
-    article: { title, created: date, content: __html },
+    article: { title, category, created: date, content: __html },
   } = articleResponse
 
   debug(`----- articleResponse: ${JSON.stringify(articleResponse)}`)
@@ -54,16 +55,28 @@ export default async function Article({ params }: ArticleParams) {
     <>
       <Header styles={styles} />
       <main className='article-main p-20'>
-        <h1 className='font-bold text-2xl'>{title}</h1>
-        <p className='publish-date'>
-          {date.toLocaleDateString('en-us', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })}
+        <h1 className='font-bold text-4xl text-green-400'>{title}</h1>
+        <p className='publish-date text-xs'>
+          {date
+            .toLocaleDateString('en-us', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })
+            .toLowerCase()}{' '}
+          <span className='text-green-400 ml-2 mr-2'>|</span>
+          <Link href={`/${category}`} label={category} />
         </p>
         <article className='article' dangerouslySetInnerHTML={{ __html }} />
+        <div className='grid grid-flow-col justify-center content-center h-40'>
+          <img
+            width='80px'
+            height='80px'
+            src='/s9tpepper_smaller.svg'
+            alt='s9tpepper logo'
+          />
+        </div>
       </main>
       <Footer />
     </>

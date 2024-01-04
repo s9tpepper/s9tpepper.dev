@@ -23,12 +23,14 @@ export default function ArticleCard(props: ArticleCardProps) {
           {article.title}
         </h2>
         <span className='text-[8px] leading-[10px]'>
-          {new Date(article.created).toLocaleDateString('en-us', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })}
+          {new Date(article.created)
+            .toLocaleDateString('en-us', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })
+            .toLowerCase()}
         </span>
         <div>
           <img

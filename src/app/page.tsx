@@ -17,12 +17,12 @@ export default function Home() {
         <Header />
 
         <p className='col-span-1 row-span-1 p-10 pt-0 md:pb-24 md:pr-24'>
-          Hello! I am a full-stack software engineer from Long Beach, CA. I
-          enjoy working on all the moving parts of a software project. I also do
-          some vegetable gardening in my spare time, as well as BBQ&apos;ing.
-          Mainly Texas style smoking - brisket, brisket, brisket! When I&apos;m
-          not out in the backyard smoking or gardening I also enjoy a good video
-          game. <br />{' '}
+          Hello! I am a full-stack software engineer originally from East Los
+          Angeles and now doing my thing out of Long Beach, CA. I enjoy working
+          on all parts of a software project. I love vegetable gardening in my
+          spare time, as well as BBQ&apos;ing, mainly Texas style smoking -
+          brisket, brisket, brisket! When I&apos;m not out in the backyard
+          smoking or gardening I also enjoy a good video game. <br />{' '}
           {<Link href='/about' label='Read more' className='link text-xs' />}
         </p>
       </main>
