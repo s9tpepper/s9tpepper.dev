@@ -18,6 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang='en'>
+      <head>
+        <link rel='shortcut icon' href='/favicon-16x16.png' />
+      </head>
       <body>
         <NextSSRPlugin routerConfig={extractRouterConfig(fileRouter)} />
         {children}
