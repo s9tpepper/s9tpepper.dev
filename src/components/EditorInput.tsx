@@ -9,7 +9,7 @@ type EditorInputProps = {
   fieldType?: string
   className?: string
   showLabel?: boolean
-  onChange: (event: ChangeEvent<HTMLInputElement>) => {}
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
 export default function EditorInput(props: EditorInputProps) {

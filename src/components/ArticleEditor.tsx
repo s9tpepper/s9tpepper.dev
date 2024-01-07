@@ -226,7 +226,7 @@ export default function ArticleEditor(props: ArticleEditorProps) {
         />
         <EditorInput
           fieldName='created'
-          fieldValue={formInputs?.created?.toString()}
+          fieldValue={formInputs?.created?.toString() || ''}
           fieldHidden={true}
           onChange={onFormUpdate}
         />
