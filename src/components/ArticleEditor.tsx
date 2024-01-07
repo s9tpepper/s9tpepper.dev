@@ -20,6 +20,7 @@ import { Editor as TinyMCEEditor } from 'tinymce'
 import { redirect, useParams, useRouter } from 'next/navigation'
 
 import { UploadButton } from '@/utils/uploadthing'
+import EditorInput from './EditorInput'
 
 const debug = Debug('s9tpepper:components:ArticleEditor')
 
@@ -151,35 +152,23 @@ export default function ArticleEditor(props: ArticleEditorProps) {
           </a>
         </div>
         <div className='grid grid-cols-[auto_1fr] grid-rows-auto gap-2 max-w-[90%] ml-auto mr-auto pb-6'>
-          <label htmlFor='title'>Title:</label>
-          <input
-            id='title'
-            name='title'
-            type='text'
-            value={formInputs?.title || ''}
+          <EditorInput
+            fieldLabel='Title:'
+            fieldName='title'
+            fieldValue={formInputs?.title || ''}
             onChange={onFormUpdate}
-            className='p-2'
-            required
           />
-          <label htmlFor='category'>Category:</label>
-          <input
-            id='category'
-            name='category'
-            type='text'
-            value={formInputs?.category || ''}
+          <EditorInput
+            fieldLabel='Category:'
+            fieldName='category'
+            fieldValue={formInputs?.category || ''}
             onChange={onFormUpdate}
-            className='p-2'
-            required
           />
-          <label htmlFor='slug'>Slug:</label>
-          <input
-            id='slug'
-            name='slug'
-            type='text'
-            value={formInputs?.slug || ''}
+          <EditorInput
+            fieldLabel='Slug:'
+            fieldName='slug'
+            fieldValue={formInputs?.slug || ''}
             onChange={onSlugChange}
-            className='p-2'
-            required
           />
           <label>Upload Hero Image:</label>
           <UploadButton
@@ -229,36 +218,28 @@ export default function ArticleEditor(props: ArticleEditorProps) {
             />
           </div>
         </div>
-        <input
-          id='hero'
-          name='hero'
-          type='current'
-          hidden
-          value={formInputs.hero ? JSON.stringify(formInputs.hero) : ''}
+        <EditorInput
+          fieldName='hero'
+          fieldValue={formInputs?.hero ? JSON.stringify(formInputs.hero) : ''}
+          fieldHidden={true}
           onChange={noop}
         />
-        <input
-          id='created'
-          name='created'
-          type='text'
-          value={formInputs?.created?.toISOString()}
-          hidden
+        <EditorInput
+          fieldName='created'
+          fieldValue={formInputs?.created?.toString()}
+          fieldHidden={true}
           onChange={onFormUpdate}
         />
-        <input
-          id='content'
-          name='content'
-          type='text'
-          value={formInputs?.content || ''}
-          hidden
+        <EditorInput
+          fieldName='content'
+          fieldValue={formInputs?.content || ''}
+          fieldHidden={true}
           onChange={onFormUpdate}
         />
-        <input
-          id='_id'
-          name='_id'
-          type='text'
-          value={(formInputs?._id as string) || ''}
-          hidden
+        <EditorInput
+          fieldName='_id'
+          fieldValue={(formInputs?._id as string) || ''}
+          fieldHidden={true}
           onChange={onFormUpdate}
         />
         <Editor
